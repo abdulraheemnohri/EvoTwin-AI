@@ -2,13 +2,20 @@ package com.evotwin.evolution
 
 class EvolutionEngine {
     private var score = 0
+    private val trainingLoop = SelfTrainingLoop()
 
-    fun reward() {
+    fun reward(input: String = "", response: String = "") {
         score += 1
+        if (input.isNotEmpty() && response.isNotEmpty()) {
+            trainingLoop.record(input, response, 1)
+        }
     }
 
-    fun punish() {
+    fun punish(input: String = "", response: String = "") {
         score -= 1
+        if (input.isNotEmpty() && response.isNotEmpty()) {
+            trainingLoop.record(input, response, -1)
+        }
     }
 
     fun level(): String {

@@ -8,10 +8,11 @@ import com.evotwin.ai.LiteRtEngine
 import com.evotwin.evolution.EvolutionEngine
 import com.evotwin.memory.MemoryBrain
 import com.evotwin.memory.MemoryDB
-import com.evotwin.ui.ChatScreen
+import com.evotwin.ui.MainScreen
 import com.evotwin.ui.ChatViewModel
 import com.evotwin.utils.PromptEngine
 import com.evotwin.voice.VoiceEngine
+import com.evotwin.automation.AutomationManager
 
 class MainActivity : ComponentActivity() {
     private lateinit var chatViewModel: ChatViewModel
@@ -26,6 +27,7 @@ class MainActivity : ComponentActivity() {
         val promptEngine = PromptEngine()
         val evolutionEngine = EvolutionEngine()
         val voiceEngine = VoiceEngine(this)
+        val automationManager = AutomationManager(this)
 
         val aiEngine = AiEngine(
             liteRtEngine,
@@ -33,13 +35,14 @@ class MainActivity : ComponentActivity() {
             memoryBrain,
             promptEngine,
             evolutionEngine,
-            voiceEngine
+            voiceEngine,
+            automationManager
         )
 
         chatViewModel = ChatViewModel(aiEngine)
 
         setContent {
-            ChatScreen(chatViewModel)
+            MainScreen(chatViewModel)
         }
     }
 }

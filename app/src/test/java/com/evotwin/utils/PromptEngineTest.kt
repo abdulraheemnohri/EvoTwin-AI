@@ -5,16 +5,14 @@ import org.junit.Test
 
 class PromptEngineTest {
     @Test
-    fun testPromptBuilding() {
+    fun testPromptBuildingWithHabits() {
         val engine = PromptEngine()
-        val base = "Hello"
-        val memory = "Old conversation"
-        val personality = "Friendly"
+        engine.recordHabit("Hello world world world")
 
-        val prompt = engine.build(base, memory, personality)
+        val prompt = engine.build("How are you", "Old memory", "Friendly")
 
         assertTrue(prompt.contains("Personality: Friendly"))
-        assertTrue(prompt.contains("Past Conversations:\nOld conversation"))
-        assertTrue(prompt.contains("Current User Message: Hello"))
+        assertTrue(prompt.contains("User Habits (Common Words): world"))
+        assertTrue(prompt.contains("Current User Message: How are you"))
     }
 }

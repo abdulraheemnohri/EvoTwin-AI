@@ -10,13 +10,13 @@ class EvolutionEngineTest {
 
         assertEquals("Basic", engine.level())
 
-        repeat(11) { engine.reward() }
+        repeat(11) { engine.reward("input", "long response here to trigger reward") }
         assertEquals("Adaptive", engine.level())
 
-        repeat(40) { engine.reward() }
+        repeat(40) { engine.reward("input", "long response here to trigger reward") }
         assertEquals("Evolving AI", engine.level())
 
-        engine.punish()
+        engine.punish("input", "bad response")
         // Score is now 50 (11 + 40 - 1), still "Evolving AI" if >= 50
         assertEquals("Evolving AI", engine.level())
     }

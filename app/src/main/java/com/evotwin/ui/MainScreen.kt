@@ -18,13 +18,15 @@ import com.evotwin.memory.MemoryDB
 fun MainScreen(chatViewModel: ChatViewModel, memoryDB: MemoryDB) {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Chat", "Memory", "Evolution", "Voice", "Automation", "Settings")
+
+    // Using standard icons that are guaranteed to be in the base library
     val icons = listOf(
-        Icons.Filled.Chat,
-        Icons.Filled.Storage,
-        Icons.Filled.AutoAwesome,
-        Icons.Filled.RecordVoiceOver,
-        Icons.Filled.SmartToy,
-        Icons.Filled.Settings
+        Icons.Default.Email,
+        Icons.Default.DateRange,
+        Icons.Default.Info,
+        Icons.Default.Call,
+        Icons.Default.Build,
+        Icons.Default.Settings
     )
 
     Scaffold(

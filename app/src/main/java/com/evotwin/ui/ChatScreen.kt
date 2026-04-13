@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -25,37 +26,60 @@ fun ChatScreen(viewModel: ChatViewModel, modifier: Modifier = Modifier) {
                         .padding(vertical = 4.dp),
                     contentAlignment = if (message.isUser) Alignment.CenterEnd else Alignment.CenterStart
                 ) {
-                    Text(
-                        text = message.text,
-                        modifier = Modifier
-                            .background(
-                                color = if (message.isUser) Color(0xFFD1E7FF) else Color(0xFFF1F1F1),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(8.dp)
-                    )
+                    val bubbleColor = if (message.isUser)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.surfaceVariant
+
+                    Surface(
+                        color = bubbleColor,
+                        shape = RoundedCornerShape(
+                            topStart = 16.dp,
+                            topEnd = 16.dp,
+                            bottomStart = if (message.isUser) 16.dp else 0.dp,
+                            bottomEnd = if (message.isUser) 0.dp else 16.dp
+                        ),
+                        tonalElevation = 2.dp,
+                        modifier = Modifier.widthIn(max = 280.dp)
+                    ) {
+                        Text(
+                            text = message.text,
+                            modifier = Modifier.padding(12.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextField(
                 value = input,
                 onValueChange = { input = it },
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Type a message...") }
+                placeholder = { Text("Ask your Twin...") },
+                shape = RoundedCornerShape(24.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Button(onClick = {
-                if (input.isNotBlank()) {
-                    viewModel.sendMessage(input)
-                    input = ""
-                }
-            }) {
+            FloatingActionButton(
+                onClick = {
+                    if (input.isNotBlank()) {
+                        viewModel.sendMessage(input)
+                        input = ""
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = RoundedCornerShape(24.dp)
+            ) {
                 Text("Send")
             }
         }

@@ -10,6 +10,7 @@ import com.evotwin.memory.MemoryBrain
 import com.evotwin.memory.MemoryDB
 import com.evotwin.ui.MainScreen
 import com.evotwin.ui.ChatViewModel
+import com.evotwin.ui.EvoTwinTheme
 import com.evotwin.utils.PromptEngine
 import com.evotwin.voice.VoiceEngine
 import com.evotwin.automation.AutomationManager
@@ -20,7 +21,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize dependencies
         val liteRtEngine = LiteRtEngine(this)
         val memoryDB = MemoryDB(this)
         val memoryBrain = MemoryBrain()
@@ -42,7 +42,9 @@ class MainActivity : ComponentActivity() {
         chatViewModel = ChatViewModel(aiEngine)
 
         setContent {
-            MainScreen(chatViewModel, memoryDB)
+            EvoTwinTheme {
+                MainScreen(chatViewModel, memoryDB)
+            }
         }
     }
 }

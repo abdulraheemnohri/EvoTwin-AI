@@ -27,14 +27,20 @@ class MemoryDB(context: Context) :
     }
 
     fun getRecent(): String {
-        val c = readableDatabase.rawQuery(
+        val cursor = readableDatabase.rawQuery(
             "SELECT user, ai FROM memory ORDER BY id DESC LIMIT 5",
             null
         )
+
         val sb = StringBuilder()
-        while (c.moveToNext()) {
-            sb.append(c.getString(0)).append(" -> ").append(c.getString(1)).append("\n")
+        try {
+            while (cursor.moveToNext()) {
+                sb.append(cursor.getString(0)).append(" -> ").append(cursor.getString(1)).append("\n")
+            }
+        } finally {
+            cursor.close()
         }
+
         return sb.toString()
     }
 }

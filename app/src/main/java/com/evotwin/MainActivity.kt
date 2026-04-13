@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         chatViewModel = ChatViewModel(aiEngine)
 
         setContent {
-            MainScreen(chatViewModel)
+            MainScreen(chatViewModel, memoryDB)
         }
     }
 }

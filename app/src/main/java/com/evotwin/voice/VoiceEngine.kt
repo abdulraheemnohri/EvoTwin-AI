@@ -12,4 +12,9 @@ class VoiceEngine(context: Context) {
     fun speak(text: String) {
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
     }
+
+    fun learnVoicePattern(audioData: ByteArray) {
+        // Mock voice cloning logic
+        println("VoiceEngine: Learning voice pattern from ${audioData.size} bytes.")
+    }
 }

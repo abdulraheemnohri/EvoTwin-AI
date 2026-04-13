@@ -2,6 +2,7 @@ package com.evotwin.utils
 
 class PromptEngine {
     private val habits = mutableMapOf<String, Int>()
+    var selectedTone: String = "Balanced"
 
     fun recordHabit(text: String) {
         val words = text.lowercase().split(" ").filter { it.length > 3 }
@@ -15,14 +16,15 @@ class PromptEngine {
 
         return """
             System: You are EvoTwin, a personal AI assistant.
+            Tone: ${selectedTone}
             Personality: ${personality}
-            User Habits (Common Words): ${if (commonWords.isEmpty()) "None yet" else commonWords}
+            User Habits: ${if (commonWords.isEmpty()) "None" else commonWords}
 
-            Past Conversations:
+            Context (Past Conversations):
             ${memory}
 
-            Current User Message: ${base}
-            AI:
+            Message: ${base}
+            AI Response:
         """.trimIndent()
     }
 }

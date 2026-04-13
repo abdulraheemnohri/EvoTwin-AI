@@ -11,62 +11,62 @@ class AiEngine(
     private val lite: LiteRtEngine,
     private val memoryDB: MemoryDB,
     private val brain: MemoryBrain,
-    private val promptEngine: PromptEngine,
+    val promptEngine: PromptEngine,
     private val evolutionEngine: EvolutionEngine,
     private val voiceEngine: VoiceEngine,
     private val automationManager: AutomationManager
 ) {
-    private val agentManager = AgentManager(memoryDB, brain)
+    private val intentAnalyzer = IntentAnalyzer()
+    private val taskGraphBuilder = TaskGraphBuilder()
+    private val critiqueEngine = CritiqueEngine()
+    private val synthesisEngine = ResponseSynthesisEngine()
 
     fun chat(input: String): String {
-        // Record habit
-        promptEngine.recordHabit(input)
+        // 1. Intent Analysis
+        val intentProfile = intentAnalyzer.analyze(input)
 
-        val intent = agentManager.processIntent(input)
+        // 2. Planning
+        val plan = taskGraphBuilder.buildPlan(intentProfile, input)
 
+        // 3. Context Retrieval
         val recentMemory = memoryDB.getRecent()
         val semanticMemory = brain.search(input)
 
-        val personality = "Level: ${evolutionEngine.level()} - Personal and efficient."
+        // 4. Reasoning / Generation
+        val personality = "Level: ${evolutionEngine.level()} - AGI Persona."
+        val prompt = promptEngine.build(
+            base = input,
+            memory = recentMemory + "\n" + semanticMemory,
+            personality = personality
+        )
 
-        val prompt = when (intent) {
-            is AgentManager.IntentResult.GeneralChat -> {
-                promptEngine.build(
-                    base = input,
-                    memory = recentMemory + "\n" + semanticMemory,
-                    personality = personality
-                )
-            }
-            is AgentManager.IntentResult.Automation -> {
-                automationManager.execute(intent.action)
-                "System Action: ${intent.action} executed. User Context: $input"
-            }
-            is AgentManager.IntentResult.Memory -> {
-                "Memory stored: ${intent.confirmation}. Context: $input"
-            }
+        val rawResponse = lite.generate(prompt)
+
+        // 5. Self-Critique
+        val evaluation = critiqueEngine.evaluate(input, rawResponse)
+
+        // 6. Response Synthesis
+        val finalResponse = synthesisEngine.synthesize(plan, rawResponse, evaluation)
+
+        // 7. Action Execution (if applicable)
+        if (intentProfile.type == IntentAnalyzer.IntentType.AUTOMATION) {
+            automationManager.execute(input)
         }
 
-        val response = lite.generate(prompt)
-
-        // Calculate importance (mock: messages > 50 chars are important)
+        // 8. Memory & Evolution Update
         val importance = if (input.length > 50) 1 else 0
-
-        // Save to structured memory
-        memoryDB.save(input, response, importance)
-
-        // Add to semantic memory
+        memoryDB.save(input, finalResponse, importance)
         brain.add(input, floatArrayOf(0f), importance)
 
-        // Voice output
-        voiceEngine.speak(response)
+        promptEngine.recordHabit(input)
+        voiceEngine.speak(finalResponse)
 
-        // Evolution feedback
-        if (response.length > 20) {
-            evolutionEngine.reward(input, response)
-        } else if (response.contains("sorry", ignoreCase = true)) {
-            evolutionEngine.punish(input, response)
+        if (evaluation.score >= 7) {
+            evolutionEngine.reward(input, finalResponse)
+        } else {
+            evolutionEngine.punish(input, finalResponse)
         }
 
-        return response
+        return finalResponse
     }
 }

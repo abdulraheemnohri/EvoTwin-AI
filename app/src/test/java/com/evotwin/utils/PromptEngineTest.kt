@@ -12,7 +12,7 @@ class PromptEngineTest {
         val prompt = engine.build("How are you", "Old memory", "Friendly")
 
         assertTrue(prompt.contains("Personality: Friendly"))
-        assertTrue(prompt.contains("User Habits (Common Words): world"))
-        assertTrue(prompt.contains("Current User Message: How are you"))
+        assertTrue(prompt.contains("User Habits: world"))
+        assertTrue(prompt.contains("Message: How are you"))
     }
 }

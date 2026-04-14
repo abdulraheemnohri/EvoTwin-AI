@@ -4,12 +4,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import java.io.File
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
     Column(modifier.fillMaxSize().padding(16.dp)) {
         Text("System Settings", style = MaterialTheme.typography.headlineMedium)
+
+        if (viewModel.statusMessage.isNotEmpty()) {
+            Text(viewModel.statusMessage, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+        }
+
         Spacer(Modifier.height(16.dp))
 
         Text("Personality Mode", style = MaterialTheme.typography.titleMedium)
@@ -53,11 +62,22 @@ fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) 
             color = if (viewModel.isModelLoaded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
 
         Spacer(Modifier.height(8.dp))
-        Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = { viewModel.downloadModel(context) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Download Gemma Model (2.5GB)")
         }
 
-        OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+        OutlinedButton(
+            onClick = {
+                // Mock upload with a dummy file for testing logic
+                val dummyFile = File(context.cacheDir, "mock_model.litertlm")
+                if (!dummyFile.exists()) dummyFile.writeText("mock content")
+                viewModel.uploadModel(context, dummyFile)
+            },
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+        ) {
             Text("Upload Model from storage")
         }
 

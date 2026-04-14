@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
 
         val evolutionViewModel = EvolutionViewModel(evolutionEngine)
         val automationViewModel = AutomationViewModel()
-        val settingsViewModel = SettingsViewModel()
+        val settingsViewModel = SettingsViewModel(liteRtEngine)
 
         val aiEngine = AiEngine(
             liteRtEngine,

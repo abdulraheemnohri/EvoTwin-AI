@@ -2,6 +2,7 @@ package com.evotwin.ui
 
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -59,11 +60,34 @@ class SettingsViewModel(private val liteRtEngine: LiteRtEngine?) : ViewModel() {
         viewModelScope.launch {
             statusMessage = "Processing model file..."
             try {
+                // Request persistable permission just in case, though usually not needed for immediate copy
+                try {
+                    context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (e: Exception) {
+                    // Ignore if not supported by the provider
+                }
+
                 withContext(Dispatchers.IO) {
                     val destFile = File(context.filesDir, "gemma-4-E2B-it.litertlm")
+                    val fileSize = getFileSize(context, uri)
+
                     context.contentResolver.openInputStream(uri)?.use { input ->
                         FileOutputStream(destFile).use { output ->
-                            input.copyTo(output)
+                            val buffer = ByteArray(1024 * 1024) // 1MB buffer
+                            var bytesRead: Int
+                            var totalRead: Long = 0
+
+                            while (input.read(buffer).also { bytesRead = it } != -1) {
+                                output.write(buffer, 0, bytesRead)
+                                totalRead += bytesRead
+
+                                if (fileSize > 0) {
+                                    val progress = (totalRead * 100 / fileSize).toInt()
+                                    withContext(Dispatchers.Main) {
+                                        statusMessage = "Uploading: $progress%"
+                                    }
+                                }
+                            }
                         }
                     }
                     liteRtEngine?.reloadModel()
@@ -73,6 +97,18 @@ class SettingsViewModel(private val liteRtEngine: LiteRtEngine?) : ViewModel() {
             } catch (e: Exception) {
                 statusMessage = "Upload failed: ${e.message}"
             }
+        }
+    }
+
+    private fun getFileSize(context: Context, uri: Uri): Long {
+        return try {
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                cursor.moveToFirst()
+                cursor.getLong(sizeIndex)
+            } ?: 0L
+        } catch (e: Exception) {
+            0L
         }
     }
 }

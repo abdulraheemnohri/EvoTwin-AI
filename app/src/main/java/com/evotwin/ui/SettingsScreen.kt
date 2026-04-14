@@ -16,7 +16,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) 
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         uri?.let { viewModel.uploadModel(context, it) }
     }
@@ -91,7 +91,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) 
         }
 
         OutlinedButton(
-            onClick = { launcher.launch("*/*") },
+            onClick = { launcher.launch(arrayOf("*/*")) },
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
         ) {
             Text("Upload Model from storage")

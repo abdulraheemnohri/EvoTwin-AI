@@ -12,6 +12,8 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     var voiceCloningEnabled by remember { mutableStateOf(true) }
     var importanceThreshold by remember { mutableFloatStateOf(50f) }
 
+    val modelUrl = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm?download=true"
+
     Column(modifier.fillMaxSize().padding(16.dp)) {
         Text("System Settings", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(16.dp))
@@ -40,6 +42,33 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             value = importanceThreshold,
             onValueChange = { importanceThreshold = it },
             valueRange = 10f..200f
+        )
+
+        Spacer(Modifier.height(24.dp))
+        Divider()
+        Spacer(Modifier.height(24.dp))
+
+        Text("Model Management", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(8.dp))
+
+        Button(
+            onClick = { /* In a real app, trigger a DownloadManager request */ },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Download Gemma Model (2.5GB)")
+        }
+
+        OutlinedButton(
+            onClick = { /* In a real app, trigger a FilePicker intent */ },
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+        ) {
+            Text("Upload Model from Local Storage")
+        }
+
+        Text(
+            "Model Source: Hugging Face / LiteRT Community",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 8.dp)
         )
 
         Spacer(Modifier.height(32.dp))

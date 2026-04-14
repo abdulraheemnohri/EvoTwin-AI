@@ -9,21 +9,29 @@ class AutomationManager(private val context: Context) {
 
     fun execute(action: String) {
         when {
+            action.contains("swipe", ignoreCase = true) -> simulateSwipe()
+            action.contains("tap", ignoreCase = true) -> simulateTap()
             action.contains("open", ignoreCase = true) -> {
                 val appName = action.substringAfter("open ").trim()
                 openApp(appName)
             }
-            action.contains("wifi", ignoreCase = true) -> {
-                toggleWifi()
-            }
-            action.contains("message", ignoreCase = true) -> {
-                sendMessage(action)
-            }
+            action.contains("wifi", ignoreCase = true) -> toggleWifi()
+            action.contains("message", ignoreCase = true) -> sendMessage(action)
         }
     }
 
+    private fun simulateSwipe() {
+        // Mock gesture simulation logic
+        println("AutomationManager: Simulating swipe gesture.")
+    }
+
+    private fun simulateTap() {
+        // Mock gesture simulation logic
+        println("AutomationManager: Simulating tap gesture.")
+    }
+
     private fun openApp(name: String) {
-        val intent = context.packageManager.getLaunchIntentForPackage(name) // Simplification: assuming package name
+        val intent = context.packageManager.getLaunchIntentForPackage(name)
         if (intent != null) {
             context.startActivity(intent)
         }
@@ -34,10 +42,9 @@ class AutomationManager(private val context: Context) {
     }
 
     private fun sendMessage(action: String) {
-        // Mock logic for sending a message via Intent
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("smsto:")
-            putExtra("sms_body", "EvoTwin Auto-Reply: $action")
+            putExtra("sms_body", "EvoTwin AGI Auto-Reply: $action")
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)

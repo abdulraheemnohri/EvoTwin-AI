@@ -15,18 +15,18 @@ import com.evotwin.memory.MemoryDB
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(chatViewModel: ChatViewModel, memoryDB: MemoryDB) {
+fun MainScreen(
+    chatViewModel: ChatViewModel,
+    memoryDB: MemoryDB,
+    evolutionViewModel: EvolutionViewModel,
+    automationViewModel: AutomationViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Chat", "Memory", "Evolution", "Voice", "Automation", "Settings")
-
-    // Using standard icons that are guaranteed to be in the base library
     val icons = listOf(
-        Icons.Default.Email,
-        Icons.Default.DateRange,
-        Icons.Default.Info,
-        Icons.Default.Call,
-        Icons.Default.Build,
-        Icons.Default.Settings
+        Icons.Default.Email, Icons.Default.DateRange, Icons.Default.Star,
+        Icons.Default.Face, Icons.Default.Build, Icons.Default.Settings
     )
 
     Scaffold(
@@ -41,19 +41,11 @@ fun MainScreen(chatViewModel: ChatViewModel, memoryDB: MemoryDB) {
                         )
                         Text("EvoTwin AGI", style = MaterialTheme.typography.titleLarge)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
-                )
+                }
             )
         },
         bottomBar = {
-            ScrollableTabRow(
-                selectedTabIndex = selectedItem,
-                edgePadding = 16.dp,
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
+            ScrollableTabRow(selectedTabIndex = selectedItem) {
                 items.forEachIndexed { index, item ->
                     Tab(
                         selected = selectedItem == index,
@@ -68,11 +60,11 @@ fun MainScreen(chatViewModel: ChatViewModel, memoryDB: MemoryDB) {
         Surface(modifier = Modifier.padding(innerPadding)) {
             when (selectedItem) {
                 0 -> ChatScreen(chatViewModel)
-                1 -> MemoryViewer(memoryDB)
-                2 -> EvolutionDashboard()
-                3 -> VoiceControlPanel()
-                4 -> AutomationCenter()
-                5 -> SettingsScreen()
+                1 -> MemoryDashboard(memoryDB)
+                2 -> EvolutionAnalyticsScreen(evolutionViewModel)
+                3 -> VoiceIntelligenceScreen()
+                4 -> AutomationCenter(automationViewModel)
+                5 -> SettingsScreen(settingsViewModel)
             }
         }
     }

@@ -1,25 +1,46 @@
 package com.evotwin.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import java.io.File
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.uploadModel(context, it) }
+    }
+
     Column(modifier.fillMaxSize().padding(16.dp)) {
         Text("System Settings", style = MaterialTheme.typography.headlineMedium)
 
         if (viewModel.statusMessage.isNotEmpty()) {
-            Text(viewModel.statusMessage, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            ) {
+                Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (viewModel.statusMessage.contains("...")) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Text(viewModel.statusMessage, style = MaterialTheme.typography.bodySmall)
+                }
+            }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         Text("Personality Mode", style = MaterialTheme.typography.titleMedium)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -70,12 +91,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) 
         }
 
         OutlinedButton(
-            onClick = {
-                // Mock upload with a dummy file for testing logic
-                val dummyFile = File(context.cacheDir, "mock_model.litertlm")
-                if (!dummyFile.exists()) dummyFile.writeText("mock content")
-                viewModel.uploadModel(context, dummyFile)
-            },
+            onClick = { launcher.launch("*/*") },
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
         ) {
             Text("Upload Model from storage")

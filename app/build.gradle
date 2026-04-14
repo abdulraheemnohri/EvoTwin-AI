@@ -32,6 +32,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion "1.5.3"
     }
+
+    androidResources {
+        noCompress 'litertlm'
+    }
 }
 
 dependencies {

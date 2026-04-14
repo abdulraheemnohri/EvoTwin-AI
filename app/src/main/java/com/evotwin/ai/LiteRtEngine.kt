@@ -12,15 +12,28 @@ class LiteRtEngine(private val context: Context) {
     private val modelFileName = "gemma-4-E2B-it.litertlm"
 
     init {
+        reloadModel()
+    }
+
+    fun reloadModel() {
         val storageModel = File(context.filesDir, modelFileName)
         if (storageModel.exists()) {
-            loadFromStorage(storageModel)
-        } else {
             try {
-                loadFromAssets(modelFileName)
+                loadFromStorage(storageModel)
             } catch (e: Exception) {
-                println("LiteRtEngine: No model found in storage or assets.")
+                println("LiteRtEngine: Failed to load from storage: ${e.message}")
+                loadAssetsFallback()
             }
+        } else {
+            loadAssetsFallback()
+        }
+    }
+
+    private fun loadAssetsFallback() {
+        try {
+            loadFromAssets(modelFileName)
+        } catch (e: Exception) {
+            println("LiteRtEngine: No model found in assets.")
         }
     }
 
@@ -42,11 +55,11 @@ class LiteRtEngine(private val context: Context) {
     }
 
     fun generate(prompt: String): String {
-        if (interpreter == null) return "AI Model not loaded. Please download or upload in settings."
+        val currentInterpreter = interpreter ?: return "AI Model not loaded. Please download or upload in settings."
 
         val input = arrayOf(prompt)
         val output = Array(1) { ByteArray(2048) }
-        interpreter?.run(input, output)
+        currentInterpreter.run(input, output)
         return String(output[0]).trim()
     }
 }

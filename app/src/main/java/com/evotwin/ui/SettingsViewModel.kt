@@ -8,6 +8,8 @@ class SettingsViewModel : ViewModel() {
     var voiceCloningEnabled by mutableStateOf(true)
     var importanceThreshold by mutableFloatStateOf(50f)
     var personalityMode by mutableStateOf("Casual") // Work, Casual, Business
+    var isModelLoaded by mutableStateOf(false)
+    var backgroundAgentEnabled by mutableStateOf(false)
 
     fun updatePersonality(mode: String) {
         personalityMode = mode

@@ -6,6 +6,7 @@ import com.evotwin.memory.MemoryBrain
 import com.evotwin.utils.PromptEngine
 import com.evotwin.voice.VoiceEngine
 import com.evotwin.automation.AutomationManager
+import com.evotwin.automation.IntelligenceOverlay
 import com.evotwin.ui.EvolutionViewModel
 import com.evotwin.ui.AutomationViewModel
 import com.evotwin.ui.SettingsViewModel
@@ -26,11 +27,16 @@ class AiEngine(
     private val taskGraphBuilder = TaskGraphBuilder()
     private val critiqueEngine = CritiqueEngine()
     private val synthesisEngine = ResponseSynthesisEngine()
+    private val overlay = IntelligenceOverlay()
+    private val predictiveEngine = PredictiveEngine()
 
     fun chat(input: String): String {
-        // Advanced Personality & Tone Injection
         promptEngine.selectedTone = settingsViewModel.selectedTone
-        val systemContext = "Mode: ${settingsViewModel.personalityMode}. Goal: AGI Simulation."
+
+        // Context Enrichment
+        val overlayContext = overlay.analyzeForegroundApp("current.app")
+        val prediction = predictiveEngine.predictNextAction(mutableMapOf("whatsapp" to 5)) // Mock habits
+        val systemContext = "Mode: ${settingsViewModel.personalityMode}. Overlay: $overlayContext. Prediction: ${prediction ?: "None"}"
 
         // 1. Intent Analysis
         val intentProfile = intentAnalyzer.analyze(input)
@@ -63,7 +69,7 @@ class AiEngine(
         // 7. Tool/Action Execution
         if (intentProfile.type == IntentAnalyzer.IntentType.AUTOMATION) {
             automationViewModel.updateTask("Execution", "Running")
-            automationManager.execute(input) // Handles apps, settings, and gestures
+            automationManager.execute(input)
             automationViewModel.updateTask("Execution", "Complete")
         }
 

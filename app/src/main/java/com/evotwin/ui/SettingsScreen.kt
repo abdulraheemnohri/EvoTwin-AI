@@ -24,22 +24,16 @@ fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) 
         }
 
         Spacer(Modifier.height(16.dp))
-        Text("AI Tone Preference", style = MaterialTheme.typography.titleMedium)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            listOf("Casual", "Balanced", "Professional").forEach { tone ->
-                FilterChip(
-                    selected = viewModel.selectedTone == tone,
-                    onClick = { viewModel.selectedTone = tone },
-                    label = { Text(tone) }
-                )
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
         ListItem(
             headlineContent = { Text("Voice Intelligence") },
             supportingContent = { Text("Continuous Listening & Cloning") },
             trailingContent = { Switch(checked = viewModel.voiceCloningEnabled, onCheckedChange = { viewModel.voiceCloningEnabled = it }) }
+        )
+
+        ListItem(
+            headlineContent = { Text("Background AI Agent") },
+            supportingContent = { Text("AI acts before you ask") },
+            trailingContent = { Switch(checked = viewModel.backgroundAgentEnabled, onCheckedChange = { viewModel.backgroundAgentEnabled = it }) }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -54,6 +48,20 @@ fun SettingsScreen(viewModel: SettingsViewModel, modifier: Modifier = Modifier) 
         HorizontalDivider()
 
         Spacer(Modifier.height(24.dp))
+        Text("Model Management", style = MaterialTheme.typography.titleLarge)
+        Text("Status: ${if (viewModel.isModelLoaded) "Active" else "Model Not Found"}",
+            color = if (viewModel.isModelLoaded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+
+        Spacer(Modifier.height(8.dp))
+        Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
+            Text("Download Gemma Model (2.5GB)")
+        }
+
+        OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+            Text("Upload Model from storage")
+        }
+
+        Spacer(Modifier.height(32.dp))
         Button(
             onClick = {},
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),

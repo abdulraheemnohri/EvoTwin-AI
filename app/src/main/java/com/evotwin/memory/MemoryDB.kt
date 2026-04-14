@@ -4,9 +4,12 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.content.ContentValues
+import com.evotwin.utils.SecurityManager
 
 class MemoryDB(context: Context) :
     SQLiteOpenHelper(context, "memory.db", null, 2) {
+
+    private val securityManager = SecurityManager()
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""
@@ -27,8 +30,8 @@ class MemoryDB(context: Context) :
 
     fun save(u: String, a: String, importance: Int = 0) {
         val values = ContentValues().apply {
-            put("user", u)
-            put("ai", a)
+            put("user", securityManager.encrypt(u))
+            put("ai", securityManager.encrypt(a))
             put("importance", importance)
         }
         writableDatabase.insert("memory", null, values)
@@ -36,14 +39,16 @@ class MemoryDB(context: Context) :
 
     fun getRecent(): String {
         val cursor = readableDatabase.rawQuery(
-            "SELECT user, ai FROM memory ORDER BY importance DESC, id DESC LIMIT 5",
+            "SELECT user, ai FROM memory ORDER BY id DESC LIMIT 10",
             null
         )
 
         val sb = StringBuilder()
         try {
             while (cursor.moveToNext()) {
-                sb.append(cursor.getString(0)).append(" -> ").append(cursor.getString(1)).append("\n")
+                val u = securityManager.decrypt(cursor.getString(0))
+                val a = securityManager.decrypt(cursor.getString(1))
+                sb.append(u).append(" -> ").append(a).append("\n")
             }
         } finally {
             cursor.close()
